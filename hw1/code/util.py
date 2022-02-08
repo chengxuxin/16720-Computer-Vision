@@ -18,10 +18,10 @@ def display_filter_responses(opts, response_maps):
     
     n_scale = len(opts.filter_scales)
     plt.figure(1)
-    
+    response_maps = response_maps.reshape((*response_maps.shape[:2], 3, n_scale, 4))
     for i in range(n_scale*4):
         plt.subplot(n_scale, 4, i+1)
-        resp = response_maps[:, :, i*3:i*3 + 3]
+        resp = response_maps[:, :, :, i//4, i%4]
         resp_min = resp.min(axis=(0,1), keepdims=True)
         resp_max = resp.max(axis=(0,1), keepdims=True)
         resp = (resp - resp_min)/(resp_max - resp_min)
