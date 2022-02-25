@@ -1,2 +1,7 @@
 *data
 *pycache*
+*jpeg
+*jpg
+*png
+*mp4
+*.DS_Store

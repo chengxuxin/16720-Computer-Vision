@@ -23,7 +23,7 @@ def get_opts():
 
     ## Visual words (requires tuning)
     parser.add_argument('--filter-scales', nargs='+', type=float,
-                        default=[1, 2, 4, 8, 16],
+                        default=[1, 2, 3, 6],
                         help='a list of scales for all the filters')
     parser.add_argument('--K', type=int, default=60,
                         help='# of words')

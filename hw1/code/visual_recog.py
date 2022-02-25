@@ -160,7 +160,9 @@ def similarity_to_set(word_hist, histograms):
     '''
 
     # ----- TODO -----
-    scores = np.sum(np.minimum(word_hist, histograms), axis=1)
+    # scores = np.sum(np.minimum(word_hist, histograms), axis=1)
+    # print(scores.shape)
+    scores = -np.linalg.norm(histograms-word_hist[None, :], ord=1, axis=1)
     # print(scores.shape)
     return scores
 

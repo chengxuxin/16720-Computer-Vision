@@ -15,15 +15,15 @@ def main():
     n_cpu = util.get_num_CPU()
     print(opts)
     ## Q1.1
-    img_path = join(opts.data_dir, "aquarium/sun_aztvjgubyrgvirup.jpg")
-    img = Image.open(img_path)
-    img = np.array(img).astype(np.float32)/255
-    filter_responses = visual_words.extract_filter_responses(opts, img)
-    util.display_filter_responses(opts, filter_responses)
+    # img_path = join(opts.data_dir, "aquarium/sun_aztvjgubyrgvirup.jpg")
+    # img = Image.open(img_path)
+    # img = np.array(img).astype(np.float32)/255
+    # filter_responses = visual_words.extract_filter_responses(opts, img)
+    # util.display_filter_responses(opts, filter_responses)
 
     ## Q1.2
-    # print("Computing dictionary...")
-    # visual_words.compute_dictionary(opts, n_worker=n_cpu)
+    print("Computing dictionary...")
+    visual_words.compute_dictionary(opts, n_worker=n_cpu)
     
     ## Q1.3
     # train_files = open(join(opts.data_dir, 'train_files.txt')).read().splitlines()
@@ -69,12 +69,12 @@ def main():
 
     ## Q2.1-2.4
     # Q2.1
-    # print("Building system...")
-    # visual_recog.build_recognition_system(opts, n_worker=n_cpu)
+    print("Building system...")
+    visual_recog.build_recognition_system(opts, n_worker=n_cpu)
 
     ## Q2.5
-    # print("Evaluating...")
-    # conf, accuracy = visual_recog.evaluate_recognition_system(opts, n_worker=n_cpu)
+    print("Evaluating...")
+    conf, accuracy = visual_recog.evaluate_recognition_system(opts, n_worker=n_cpu)
     # print(opts)
     # print(conf)
     # print(accuracy)
