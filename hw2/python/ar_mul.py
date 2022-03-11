@@ -33,7 +33,7 @@ def process_frame(args):
     srcframe = cv2.resize(srcframe, (cv_cover.shape[1],cv_cover.shape[0]), interpolation = cv2.INTER_AREA)
     # print(srcframe.shape, cv_cover.shape)
     # warped_img = cv2.warpPerspective(srcframe, H, dsize=(h, w))
-    final_img = compositeH(H, srcframe, frame)
+    final_img = compositeH(np.linalg.inv(H), srcframe, frame)
     return (final_img, i)
 
 if __name__ == "__main__":

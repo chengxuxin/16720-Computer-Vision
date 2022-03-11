@@ -1,8 +1,8 @@
 import numpy as np
 import cv2, os
-from matchPics import matchPics
-from helper import plotMatches
-from opts import get_opts
+from python.matchPics import matchPics
+from python.helper import plotMatches
+from python.opts import get_opts
 import matplotlib.pyplot as plt
 
 def displayMatched(opts, image1, image2):

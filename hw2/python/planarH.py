@@ -64,7 +64,6 @@ def computeH_norm(x1, x2):
     x1_norm = x1 @ T1.T
     x2_norm = x2 @ T2.T
 
-    # print(np.sum(np.linalg.norm(x1_norm - x1, axis=1)))
     # Compute homography
     H2to1 = computeH(x1_norm, x2_norm)
     # Denormalization
@@ -108,21 +107,6 @@ def computeH_ransac(locs1, locs2, opts):
 
 
 def compositeH(H2to1, template, img):
-
-    # Create a composite image after warping the template image on top
-    # of the image using the homography
-
-    # Note that the homography we compute is from the image to the template;
-    #x_template = H2to1*x_photo
-    # For warping the template to the image, we need to invert it.
-
-    # Create mask of same size as template
-
-    # Warp mask by appropriate homography
-    
-    # Warp template by appropriate homography
-
-    # Use mask to combine the warped template and the image
     mask = np.ones_like(template)
     warped_mask = cv2.warpPerspective(mask, H2to1, dsize=(img.shape[1], img.shape[0]))
 

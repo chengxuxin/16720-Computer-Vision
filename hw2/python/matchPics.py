@@ -3,9 +3,9 @@ from unicodedata import name
 import numpy as np
 import cv2
 import skimage.color
-from helper import briefMatch
-from helper import computeBrief
-from helper import corner_detection
+from python.helper import briefMatch
+from python.helper import computeBrief
+from python.helper import corner_detection
 import sys
 sys.path.append("../../")
 from hw2.python.opts import get_opts
