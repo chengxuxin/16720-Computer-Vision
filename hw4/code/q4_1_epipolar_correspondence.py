@@ -6,7 +6,7 @@ from helper import _epipoles
 from q2_1_eightpoint import eightpoint
 
 # Insert your package here
-
+from scipy.ndimage import gaussian_filter
 
 # Helper functions for this assignment. DO NOT MODIFY!!!
 def epipolarMatchGUI(I1, I2, F):
@@ -85,26 +85,51 @@ Q4.1: 3D visualization of the temple images.
 '''
 def epipolarCorrespondence(im1, im2, F, x1, y1):
     # Replace pass by your implementation
-    pass
+    a, b, c = F.dot(np.array([x1, y1, 1]))
+    im1 = gaussian_filter(im1, sigma = 2)
+    im2 = gaussian_filter(im2, sigma = 2)
+    y2s = np.arange(im2.shape[0])
+    x2s = (-(b*y2s + c)/a).astype(int)
+    # inside_indices = np.logical_and(y2s >= 0, y2s < im2.shape[1])
+    # x2s = x2s[inside_indices]
+    # y2s = y2s[inside_indices]
 
-
+    patch_size = 10
+    patch = im1[y1-patch_size:y1+patch_size, x1-patch_size:x1+patch_size]
+    # print("patch1: ", x1, y1, im1.shape)
+    for i in range(x2s.shape[0]):
+        x2 = x2s[i]
+        y2 = y2s[i]
+        if x2 > patch_size and x2 < im2.shape[1]-patch_size and y2 > patch_size and y2 < im2.shape[0]-patch_size:
+            patch2 = im2[y2-patch_size:y2+patch_size, x2-patch_size:x2+patch_size]
+            # print(patch.shape, patch2.shape, y2, im2.shape)
+            diff = patch - patch2
+            diff = np.linalg.norm(diff.flatten())
+            if not "min_diff" in locals():
+                min_diff = diff
+                min_index = i
+            elif diff < min_diff:
+                min_diff = diff
+                min_index = i
+    return x2s[min_index], y2s[min_index]
 
 if __name__ == "__main__":
 
-    correspondence = np.load('data/some_corresp.npz') # Loading correspondences
-    intrinsics = np.load('data/intrinsics.npz') # Loading the intrinscis of the camera
+    correspondence = np.load('../data/some_corresp.npz') # Loading correspondences
+    intrinsics = np.load('../data/intrinsics.npz') # Loading the intrinscis of the camera
     K1, K2 = intrinsics['K1'], intrinsics['K2']
     pts1, pts2 = correspondence['pts1'], correspondence['pts2']
-    im1 = plt.imread('data/im1.png')
-    im2 = plt.imread('data/im2.png')
+    im1 = plt.imread('../data/im1.png')
+    im2 = plt.imread('../data/im2.png')
 
 
     # ----- TODO -----
     # YOUR CODE HERE
-    
     F = eightpoint(pts1, pts2, M=np.max([*im1.shape, *im2.shape]))
+    epipolarMatchGUI(im1, im2, F)
     
     
     # Simple Tests to verify your implementation:
     x2, y2 = epipolarCorrespondence(im1, im2, F, 119, 217)
     assert(np.linalg.norm(np.array([x2, y2]) - np.array([118, 181])) < 10)
+    np.savez("../output/q4_1.npz", F=F, pts1=pts1, pts2=pts2)

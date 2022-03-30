@@ -16,18 +16,20 @@ Q3.1: Compute the essential matrix E.
 '''
 def essentialMatrix(F, K1, K2):
     # Replace pass by your implementation
-    pass
+    E = K2.T @ F @ K1
+    E = E / E[2, 2]
+    return E
 
 
 
 if __name__ == "__main__":
 
-    correspondence = np.load('data/some_corresp.npz') # Loading correspondences
-    intrinsics = np.load('data/intrinsics.npz') # Loading the intrinscis of the camera
+    correspondence = np.load('../data/some_corresp.npz') # Loading correspondences
+    intrinsics = np.load('../data/intrinsics.npz') # Loading the intrinscis of the camera
     K1, K2 = intrinsics['K1'], intrinsics['K2']
     pts1, pts2 = correspondence['pts1'], correspondence['pts2']
-    im1 = plt.imread('data/im1.png')
-    im2 = plt.imread('data/im2.png')
+    im1 = plt.imread('../data/im1.png')
+    im2 = plt.imread('../data/im2.png')
 
 
     # ----- TODO -----
@@ -35,7 +37,8 @@ if __name__ == "__main__":
 
     F = eightpoint(pts1, pts2, M=np.max([*im1.shape, *im2.shape]))
     E = essentialMatrix(F, K1, K2)
-
+    np.savez('../output/q3_1.npz', E=E, F=F)
+    print(E)
     # Simple Tests to verify your implementation:
     assert(E[2, 2] == 1)
     assert(np.linalg.matrix_rank(E) == 2)
