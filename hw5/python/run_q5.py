@@ -29,6 +29,20 @@ params = Counter()
 ##########################
 ##### your code here #####
 ##########################
+N, D = train_x.shape
+initialize_weights(D, hidden_size, params, 'layer1')
+initialize_weights(hidden_size, hidden_size, params, 'hidden1')
+initialize_weights(hidden_size, hidden_size, params, 'hidden2')
+initialize_weights(hidden_size, D, params, 'output')
+
+params['m_Wlayer1'] = np.zeros((D, hidden_size))
+params['m_blayer1'] = np.zeros(hidden_size)
+params['m_Whidden1'] = np.zeros((hidden_size, hidden_size))
+params['m_bhidden1'] = np.zeros(hidden_size)
+params['m_Whidden2'] = np.zeros((hidden_size, hidden_size))
+params['m_bhidden2'] = np.zeros(hidden_size)
+params['m_Woutput'] = np.zeros((hidden_size, D))
+params['m_boutput'] = np.zeros(D)
 
 # should look like your previous training loops
 losses = []
@@ -47,7 +61,39 @@ for itr in range(max_iters):
         ##########################
         ##### your code here #####
         ##########################
+        h = forward(xb, params, 'layer1', relu)
+        h1 = forward(h, params, 'hidden1', relu)
+        h2 = forward(h1, params, 'hidden2', relu)
+        out = forward(h2, params, 'output', sigmoid)
+    
+        loss = np.sum(np.square(out - xb))
+        total_loss += loss
+
+        delta = 2*(out - xb) 
+        delta1 = backwards(delta, params, 'output', sigmoid_deriv)
+        delta2 = backwards(delta1, params, 'hidden2', relu_deriv)
+        delta3 = backwards(delta2, params, 'hidden1', relu_deriv)
+        backwards(delta3, params, 'layer1', relu_deriv)           
         
+        params['m_Wlayer1'] = 0.9 * params['m_Wlayer1'] - learning_rate*params['grad_Wlayer1']
+        params['Wlayer1'] += params['m_Wlayer1']
+        params['m_blayer1'] = 0.9 * params['m_blayer1'] - learning_rate*params['grad_blayer1']
+        params['blayer1'] += params['m_blayer1']
+        
+        params['m_Whidden1'] = 0.9*params['m_Whidden1'] - learning_rate*params['grad_Whidden1']
+        params['Whidden1'] += params['m_Whidden1']
+        params['m_bhidden1'] = 0.9*params['m_bhidden1'] - learning_rate*params['grad_bhidden1']
+        params['bhidden1'] += params['m_bhidden1']
+        
+        params['m_Whidden2'] = 0.9*params['m_Whidden2'] - learning_rate*params['grad_Whidden2']
+        params['Whidden2'] += params['m_Whidden2']
+        params['m_bhidden2'] = 0.9*params['m_bhidden2'] - learning_rate*params['grad_bhidden2']
+        params['bhidden2'] += params['m_bhidden2']
+        
+        params['m_Woutput'] = 0.9*params['m_Woutput'] - learning_rate*params['grad_Woutput']
+        params['Woutput'] += params['m_Woutput']
+        params['m_boutput'] = 0.9*params['m_boutput'] - learning_rate*params['grad_boutput']
+        params['b_output'] += params['m_boutput']
     
     losses.append(total_loss/train_x.shape[0])
     if itr % 2 == 0:
@@ -82,7 +128,10 @@ for i, label in enumerate(visualize_labels):
 ##########################
 ##### your code here #####
 ##########################
-
+h = forward(visualize_x, params, 'layer1', relu)
+h1 = forward(h, params, 'hidden1', relu)
+h2 = forward(h1, params, 'hidden2', relu)
+reconstructed_x = forward(h2, params, 'output', sigmoid)
 
 
 # plot visualize_x and reconstructed_x
@@ -104,3 +153,11 @@ from skimage.metrics import peak_signal_noise_ratio
 ##########################
 ##### your code here #####
 ##########################
+h = forward(valid_x, params, 'layer1', relu)
+h1 = forward(h, params, 'hidden1', relu)
+h2 = forward(h1, params, 'hidden2', relu)
+reconstructed_x = forward(h2, params, 'output', sigmoid)
+total = []
+for x, y in zip(valid_x, reconstructed_x):
+    total.append(peak_signal_noise_ratio(x.reshape((32, 32)).T, y.reshape((32, 32)).T))
+print(np.mean(total))

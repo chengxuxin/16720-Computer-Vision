@@ -14,6 +14,9 @@ def initialize_weights(in_size,out_size,params,name=''):
     ##########################
     ##### your code here #####
     ##########################
+    bound = np.sqrt(6 / (in_size+out_size))
+    W = np.random.uniform(-bound, bound, (in_size, out_size))
+    b = np.zeros(out_size)
 
     params['W' + name] = W
     params['b' + name] = b
@@ -27,7 +30,7 @@ def sigmoid(x):
     ##########################
     ##### your code here #####
     ##########################
-
+    res = 1 / (1 + np.exp(-x))
     return res
 
 ############################## Q 2.2.1 ##############################
@@ -51,6 +54,8 @@ def forward(X,params,name='',activation=sigmoid):
     ##### your code here #####
     ##########################
 
+    pre_act = np.dot(X, W) + b
+    post_act = activation(pre_act)
 
     # store the pre-activation and post-activation values
     # these will be important in backprop
@@ -67,6 +72,9 @@ def softmax(x):
     ##########################
     ##### your code here #####
     ##########################
+    N, D = np.shape(x)
+    x_max = np.max(x, axis = 1)
+    res = np.exp(x-x_max[:, None]) / np.sum(np.exp(x-x_max[:, None]), axis = 1)[:, None]
 
     return res
 
@@ -80,7 +88,8 @@ def compute_loss_and_acc(y, probs):
     ##########################
     ##### your code here #####
     ##########################
-
+    loss = - np.sum(y * np.log(probs))
+    acc = np.sum(np.argmax(probs, axis = 1) == np.argmax(y, axis = 1)) / y.shape[0]
     return loss, acc 
 
 ############################## Q 2.3 ##############################
@@ -113,6 +122,13 @@ def backwards(delta,params,name='',activation_deriv=sigmoid_deriv):
     ##########################
     ##### your code here #####
     ##########################
+    d_act = activation_deriv(post_act)
+    grad_X = (d_act * delta) @ W.T
+    grad_W = X.T @ (d_act * delta)
+    grad_b = np.sum(d_act * delta, axis = 0)
+    assert grad_X.shape == X.shape
+    assert grad_W.shape == W.shape
+    assert grad_b.shape == b.shape
 
     # store the gradients
     params['grad_W' + name] = grad_W
@@ -127,4 +143,8 @@ def get_random_batches(x,y,batch_size):
     ##########################
     ##### your code here #####
     ##########################
+    N = x.shape[0]
+    random_indices = np.random.permutation(N)
+    for i in range(0, N, batch_size):
+        batches.append((x[random_indices[i:i+batch_size]], y[random_indices[i:i+batch_size]]))
     return batches

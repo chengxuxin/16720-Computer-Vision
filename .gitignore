@@ -6,3 +6,5 @@
 *mp4
 *.DS_Store
 *output
+*.gz
+CIFAR

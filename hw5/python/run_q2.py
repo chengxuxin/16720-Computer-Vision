@@ -92,17 +92,25 @@ for itr in range(max_iters):
         ##########################
         pass
         # forward
-
+        h1 = forward(xb, params, 'layer1')
+        probs = forward(h1, params, 'output', softmax)
         # loss
         # be sure to add loss and accuracy to epoch totals 
-
+        loss, acc = compute_loss_and_acc(yb, probs)
+        total_loss += loss
+        avg_acc += acc
         # backward
-
+        delta = probs - yb
+        grad = backwards(delta, params, 'output', linear_deriv)
+        backwards(grad, params, 'layer1', sigmoid_deriv)
         # apply gradient 
         # gradients should be summed over batch samples
-
-        
-
+        params['Wlayer1'] -= learning_rate*params['grad_Wlayer1']
+        params['blayer1'] -= learning_rate*params['grad_blayer1']
+        params['Woutput'] -= learning_rate*params['grad_Woutput']
+        params['boutput'] -= learning_rate*params['grad_boutput']
+    avg_acc /= batch_num
+    # total_loss /= batch_num
         
     if itr % 100 == 0:
         print("itr: {:02d} \t loss: {:.2f} \t acc : {:.2f}".format(itr,total_loss,avg_acc))
@@ -142,7 +150,33 @@ for k,v in params.items():
     ##########################
     ##### your code here #####
     ##########################
-
+    if 'W' in k:
+        m, n = v.shape
+        for i in range(m):
+            for j in range(n):
+                v[i, j] += eps
+                h1 = forward(x, params, 'layer1')
+                probs = forward(h1, params, 'output', softmax)
+                loss1, acc = compute_loss_and_acc(y, probs)
+                v[i, j] -= 2*eps
+                h1 = forward(x, params, 'layer1')
+                probs = forward(h1, params, 'output', softmax)
+                loss2, acc = compute_loss_and_acc(y, probs)
+                params['grad_' + k][i, j] = (loss1-loss2)/(2*eps)
+                v[i, j] += eps
+    if 'b' in k:
+        m = v.shape[0]
+        for i in range(m):
+            v[i] += eps
+            h1 = forward(x, params, 'layer1')
+            probs = forward(h1, params, 'output', softmax)
+            loss1, acc = compute_loss_and_acc(y, probs)
+            v[i] -= 2*eps
+            h1 = forward(x, params, 'layer1')
+            probs = forward(h1, params, 'output', softmax)
+            loss2, acc = compute_loss_and_acc(y, probs)
+            params['grad_' + k][i] = (loss1-loss2)/(2*eps)
+            v[i] += eps
 total_error = 0
 for k in params.keys():
     if 'grad_' in k:
